@@ -24,6 +24,9 @@ public class RectangularMap {
     int plantEnergy = 1;
     double jungleRatio = 0.25;
 
+    private int grassInJungle = 0;
+    private int grassInStep = 0;
+
 
     protected final Vector2d endOfTheMap;
     public final Jungle jungle;
@@ -67,46 +70,71 @@ public class RectangularMap {
 
     public void addGrass(){
         //add in Jungle;
-        boolean toBeContinued = true;
-        int forceToStop = 300;
-        while (toBeContinued) {
-            toBeContinued = false;
-            Vector2d pos = new Vector2d(getRandomNumberInRange(0, width - 1), getRandomNumberInRange(0, height - 1));
-            Grass insertGrass = new Grass(pos);
+        if (!jungleIsFull()) {
+            boolean toBeContinued = true;
+            int forceToStop = 300;
+            while (toBeContinued) {
+                toBeContinued = false;
+                Vector2d pos = new Vector2d(getRandomNumberInRange(0, width - 1), getRandomNumberInRange(0, height - 1));
+                Grass insertGrass = new Grass(pos);
 
-            if (grassMap.containsKey(insertGrass.getPosition())){
-                toBeContinued = true; forceToStop -= 1;
+                if (grassMap.containsKey(insertGrass.getPosition())) {
+                    toBeContinued = true;
+                    forceToStop -= 1;
+                }
+                if (animalObjectAt(insertGrass.getPosition()).size() >= 1) {
+                    toBeContinued = true;
+                    forceToStop -= 1;
+                } else if (!pos.precedes(jungle.endOfTheJungle) && pos.follows(jungle.startOfTheJungle)) {
+                    toBeContinued = true;
+                    forceToStop -= 1;
+                } else this.grassMap.put(insertGrass.getPosition(), insertGrass);
+                if (forceToStop <= 0) break;
             }
-            if(animalObjectAt(insertGrass.getPosition()).size() >= 1){
-                toBeContinued = true; forceToStop -= 1;
-            }
-            else if (! pos.precedes(jungle.endOfTheJungle) && pos.follows(jungle.startOfTheJungle)){
-                toBeContinued = true; forceToStop -= 1;
-            }
-            else this.grassMap.put(insertGrass.getPosition(), insertGrass);
-            if (forceToStop <= 0) break;
         }
         //add in step;
-        toBeContinued = true;
-        forceToStop = 300;
-        while (toBeContinued) {
-            toBeContinued = false;
-            Vector2d pos = new Vector2d(getRandomNumberInRange(0, width - 1), getRandomNumberInRange(0, height - 1));
-            Grass insertGrass = new Grass(pos);
+        if (!stepIsFull()) {
+            boolean toBeContinued = true;
+            int forceToStop = 300;
+            while (toBeContinued) {
+                toBeContinued = false;
+                Vector2d pos = new Vector2d(getRandomNumberInRange(0, width - 1), getRandomNumberInRange(0, height - 1));
+                Grass insertGrass = new Grass(pos);
 
-            if (grassMap.containsKey(insertGrass.getPosition())){
-                toBeContinued = true; forceToStop -= 1;
-            }
-            if(animalObjectAt(insertGrass.getPosition()).size() >= 1){
-                toBeContinued = true; forceToStop -= 1;
-            }
-            else if (pos.precedes(jungle.endOfTheJungle) && pos.follows(jungle.startOfTheJungle)){
-                toBeContinued = true; forceToStop -= 1;
-            }
-            else this.grassMap.put(insertGrass.getPosition(), insertGrass);
+                if (grassMap.containsKey(insertGrass.getPosition())) {
+                    toBeContinued = true;
+                    forceToStop -= 1;
+                }
+                if (animalObjectAt(insertGrass.getPosition()).size() >= 1) {
+                    toBeContinued = true;
+                    forceToStop -= 1;
+                } else if (pos.precedes(jungle.endOfTheJungle) && pos.follows(jungle.startOfTheJungle)) {
+                    toBeContinued = true;
+                    forceToStop -= 1;
+                } else this.grassMap.put(insertGrass.getPosition(), insertGrass);
 
-            if (forceToStop <= 0) return;
+                if (forceToStop <= 0) return;
+            }
         }
+    }
+
+    public boolean jungleIsFull(){
+        for (int i = 0; i<jungle.width; i++)
+            for (int j = 0; j<jungle.height; j++){
+                if ( isOccupied(new Vector2d(i,j))) return false;
+            }
+        return true;
+    }
+    public boolean stepIsFull(){
+        for (int i = jungle.width; i<width; i++)
+            for (int j = 0; j<jungle.height; j++){
+                if ( isOccupied(new Vector2d(i,j))) return false;
+            }
+        for (int i = 0; i<width; i++)
+            for (int j = jungle.height; j<height; j++){
+                if ( isOccupied(new Vector2d(i,j))) return false;
+            }
+        return true;
     }
 
     private static int getRandomNumberInRange(int min, int max) {
@@ -127,10 +155,7 @@ public class RectangularMap {
     }
 
     public boolean isOccupied(Vector2d position) {
-        /*
-        if(this.animals.get(position) == null) return false;
-        return true;
-                */
+
         for (int i=0; i<animalsList.size(); i++){
             if (this.animalsList.get(i).getPosition().equals(position)) return true;
         }
