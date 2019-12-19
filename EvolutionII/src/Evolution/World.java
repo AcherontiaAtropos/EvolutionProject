@@ -28,10 +28,6 @@ public class World {
             JSONParser jsonParser = new JSONParser();
             JSONObject jsonObject = (JSONObject) jsonParser.parse(reader);
 
-
-            String firstName = (String) jsonObject.get("firstname");
-            System.out.println("The first name is: " + firstName);
-
             final int width = toIntExact((long) jsonObject.get("width"));
             final int height = toIntExact((long) jsonObject.get("height"));
             final int startEnergy = toIntExact((long) jsonObject.get("startEnergy"));
@@ -49,7 +45,7 @@ public class World {
             for (int i = 0; i < 32; i++) InitGenes[i] = MoveDirection.FORWARD;
 
             for (int i = 0; i<initialNumberOfAnimals; i++) {
-                Animal wolf = new Animal(map, InitGenes);
+                Animal wolf = new Animal(map);
                 map.place(wolf);
             }
 

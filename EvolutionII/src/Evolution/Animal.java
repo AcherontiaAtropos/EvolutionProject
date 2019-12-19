@@ -12,10 +12,10 @@ public class Animal {
     static double startEnergy;
     double energyDay = 15;
     int noChildren = 0;
-    final MoveDirection [] genotype = new MoveDirection[32];
+    public final MoveDirection [] genotype = new MoveDirection[32];
     final RectangularMap map;
 
-    public Animal(RectangularMap map, MoveDirection [] initialGenotype){
+    public Animal(RectangularMap map){
         this.direction = NORTH;
         int rand = getRandomNumberInRange(0, 7);
         for (int i = 0; i< rand; i++){
@@ -28,7 +28,7 @@ public class Animal {
 
         this.position = initialPosition;
         for (int i=0; i<32; i++)
-            this.genotype [i] = initialGenotype [i];
+            this.genotype [i] = fromNumber(getRandomNumberInRange(0,7));
         repairGenotype();
     }
 
@@ -122,7 +122,7 @@ public class Animal {
     }
 
     public boolean tryToCopulate(){
-        if(map.animalObjectAt(this.position).size() > 1) return true;
+        if(map.animalObjectAt(this.position).size() > 1 && energyDay >= startEnergy/2)  return true;
         return false;
     }
 

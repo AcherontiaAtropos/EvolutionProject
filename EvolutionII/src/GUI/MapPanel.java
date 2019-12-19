@@ -15,6 +15,7 @@ public class MapPanel extends JPanel {
     final int scale;
 
     final Color [] energyColors = new Color [16];
+    final Color [] dominatingGenColors = new Color [8];
     Graphics2D g2d;
 
     public MapPanel(RectangularMap map, int scale) {
@@ -41,6 +42,15 @@ public class MapPanel extends JPanel {
         this.energyColors [14] = new Color (118, 195, 189);
         this.energyColors [15] = new Color (103, 182, 145);
 
+
+        this.dominatingGenColors [0] = new Color (177, 255,0);
+        this.dominatingGenColors [1] = new Color (255, 184,0);
+        this.dominatingGenColors [2] = new Color (255,0,0);
+        this.dominatingGenColors [3] = new Color (255,0, 189);
+        this.dominatingGenColors [4] = new Color (131,0, 255);
+        this.dominatingGenColors [5] = new Color (0, 61, 255);
+        this.dominatingGenColors [6] = new Color (0, 253, 255);
+        this.dominatingGenColors [7] = new Color (0, 255, 103);
 
 
     }
@@ -85,7 +95,7 @@ public class MapPanel extends JPanel {
         this.g2d.fill(rectangleGrass2);
     }
     protected void paintAnimal(Animal animal){
-
+//Select color
         if (animal.getEnergyDay()>=14)
             g2d.setPaint(energyColors[15]);
         else if (animal.getEnergyDay()<0){
@@ -95,14 +105,35 @@ public class MapPanel extends JPanel {
             int colorNumber = (int) (Math.ceil(animal.getEnergyDay()));
             g2d.setPaint(energyColors[colorNumber]);
         }
-
-
-
         double margin = this.scale/6;
         int x = animal.getPosition().x;
         int y = animal.getPosition().y;
 
+//Paint energyColored big circle
         Ellipse2D circle2 = new Ellipse2D.Double(x*scale + margin, y*scale + margin, 4*margin, 4*margin);
         g2d.fill(circle2);
+        g2d.setPaint(energyColors[0]);
+
+        g2d.setPaint(genesColor(animal));
+        g2d.draw(circle2);
+//Paint genesColored small circle
+        Ellipse2D circleSmall = new Ellipse2D.Double(x*scale + 2*margin, y*scale + 2*margin, 2*margin, 2*margin);
+        g2d.fill(circleSmall);
+
+    }
+    protected Color genesColor (Animal animal){
+        int[] genCount = new int[8];
+        for (int i = 0; i < 8; i++) genCount[i] = 0;
+        for (int i = 0; i < 32; i++) genCount[animal.genotype[i].toNumber()] += 1;
+        int maxGenCount = 0;
+        for (int i=0; i<8; i++){
+            if (maxGenCount<genCount[i]) maxGenCount = genCount[i];
+        }
+        int mostPopularGen = 0;
+        for (int i=0; i<8; i++){
+            if (genCount[i] == maxGenCount) mostPopularGen = i;
+        }
+        return this.dominatingGenColors[mostPopularGen];
+
     }
 }

@@ -68,30 +68,36 @@ public class RectangularMap {
     public void addGrass(){
         //add in Jungle;
         boolean toBeContinued = true;
-        int forceToStop = 50;
+        int forceToStop = 300;
         while (toBeContinued) {
             toBeContinued = false;
             Vector2d pos = new Vector2d(getRandomNumberInRange(0, width - 1), getRandomNumberInRange(0, height - 1));
             Grass insertGrass = new Grass(pos);
 
             if (grassMap.containsKey(insertGrass.getPosition())){
+                toBeContinued = true; forceToStop -= 1;
+            }
+            if(animalObjectAt(insertGrass.getPosition()).size() >= 1){
                 toBeContinued = true; forceToStop -= 1;
             }
             else if (! pos.precedes(jungle.endOfTheJungle) && pos.follows(jungle.startOfTheJungle)){
                 toBeContinued = true; forceToStop -= 1;
             }
             else this.grassMap.put(insertGrass.getPosition(), insertGrass);
-            if (forceToStop <= 0) return;
+            if (forceToStop <= 0) break;
         }
         //add in step;
         toBeContinued = true;
-        forceToStop = 50;
+        forceToStop = 300;
         while (toBeContinued) {
             toBeContinued = false;
             Vector2d pos = new Vector2d(getRandomNumberInRange(0, width - 1), getRandomNumberInRange(0, height - 1));
             Grass insertGrass = new Grass(pos);
 
             if (grassMap.containsKey(insertGrass.getPosition())){
+                toBeContinued = true; forceToStop -= 1;
+            }
+            if(animalObjectAt(insertGrass.getPosition()).size() >= 1){
                 toBeContinued = true; forceToStop -= 1;
             }
             else if (pos.precedes(jungle.endOfTheJungle) && pos.follows(jungle.startOfTheJungle)){
@@ -157,10 +163,17 @@ public class RectangularMap {
         }
         return rivals;
     }
+    public List<Animal> strongAnimalObjectAt (Vector2d position){
+        List<Animal> rivals = new ArrayList<>();
+        for (int i=0; i<animalsList.size(); i++) {
+            if (this.animalsList.get(i).getPosition().equals(position) && this.animalsList.get(i).getEnergyDay()>=Animal.startEnergy/2) rivals.add(animalsList.get(i));
+        }
+        return rivals;
+    }
 
     public void eatGrassAt (Vector2d position){
         this.grassMap.remove(position);
-        List<Animal> rivals = animalObjectAt(position);
+        List<Animal> rivals = strongAnimalObjectAt(position);
         if (rivals.size() == 1) {rivals.get(0).energyDay += plantEnergy; return;}
         double maxEnergyDay = 0;
         for (int i=0; i<rivals.size(); i++){
